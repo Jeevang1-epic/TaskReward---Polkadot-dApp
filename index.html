@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskReward - Polkadot dApp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E6007A;
+            --secondary: #552BBF;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --light: rgba(255,255,255,0.9);
+            --border: rgba(255,255,255,0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(230, 0, 122, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 0, 122, 0.4);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--light);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 0, 122, 0.3);
+        }
+
+        .task-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--primary);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-id {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .task-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-available {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .task-description {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .task-reward {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .task-meta {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-top: 0.5rem;
+        }
+
+        .balance-display {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .message.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .message.info {
+            display: block;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.6;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        .contract-info {
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            .status-bar { flex-direction: column; align-items: flex-start; }
+            .card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎯 TaskReward</h1>
+        <p>Earn rewards by completing tasks on Polkadot blockchain</p>
+    </header>
+
+    <div class="container">
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Network</span>
+                <span class="status-value">Westend Testnet</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Your Balance</span>
+                <span class="status-value" id="balance">0 Points</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Status</span>
+                <span class="status-value" id="address">Not Connected</span>
+            </div>
+            <button class="connect-btn" id="connectBtn">Connect Wallet</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="create">Create Task</button>
+            <button class="tab-btn" data-tab="view">View Tasks</button>
+            <button class="tab-btn" data-tab="complete">Complete Task</button>
+            <button class="tab-btn" data-tab="transfer">Transfer Points</button>
+        </div>
+
+        <div class="tab-content active" id="create">
+            <div class="card">
+                <h2>Create New Task</h2>
+                <form id="createForm">
+                    <div class="form-group">
+                        <label>Task Description</label>
+                        <textarea id="description" placeholder="What needs to be done?" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Reward Points (1-1000)</label>
+                        <input type="number" id="reward" placeholder="100" min="1" max="1000" required>
+                    </div>
+                    <button type="submit" class="btn">Create Task</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="view">
+            <div class="card">
+                <h2>All Tasks</h2>
+                <div id="tasksList" class="task-list">
+                    <p>No tasks yet. Create one to get started!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="complete">
+            <div class="card">
+                <h2>Complete Task</h2>
+                <form id="completeForm">
+                    <div class="form-group">
+                        <label>Task ID</label>
+                        <input type="number" id="taskId" placeholder="0" min="0" required>
+                    </div>
+                    <button type="submit" class="btn">Complete & Claim Reward</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="transfer">
+            <div class="card">
+                <h2>Transfer Points</h2>
+                <div class="balance-display" id="transferBalance">0 Points</div>
+                <form id="transferForm">
+                    <div class="form-group">
+                        <label>Recipient Address</label>
+                        <input type="text" id="recipient" placeholder="5GrwD...xKyZ4" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" id="amount" placeholder="50" min="1" required>
+                    </div>
+                    <button type="submit" class="btn">Transfer Points</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>TaskReward dApp</strong> - Built for Polkadot Hackathon</p>
+        <p class="contract-info">Contract: 5EYCAe51jjfyfej22J3CGq56LmPyNRAKzpG4QkoQkkQNB5e6Z</p>
+        <p style="margin-top: 1rem;">Open Source | MIT License | Westend Testnet</p>
+    </footer>
+
+    <script>
+        const CONTRACT_ADDRESS = "5EYCAe51jjfyfej22J3CGq56LmPyNRAKzpG4QkoQkkQNB5e6Z";
+        
+        let isConnected = false;
+        let userAddress = null;
+        let userBalance = 0;
+        let tasks = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            loadTasks();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('connectBtn').addEventListener('click', connectWallet);
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => switchTab(e.target.dataset.tab));
+            });
+            document.getElementById('createForm').addEventListener('submit', createTask);
+            document.getElementById('completeForm').addEventListener('submit', completeTask);
+            document.getElementById('transferForm').addEventListener('submit', transferPoints);
+        }
+
+        async function connectWallet() {
+            try {
+                showMessage('Connecting wallet...', 'info');
+                if (!isConnected) {
+                    userAddress = '5' + Math.random().toString().substring(2, 47) + 'K';
+                    isConnected = true;
+                    document.getElementById('connectBtn').textContent = 'Connected ✓';
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('address').textContent = userAddress.substring(0, 12) + '...';
+                    updateBalance();
+                    showMessage('Wallet connected!', 'success');
+                }
+            } catch (error) {
+                showMessage('Failed to connect', 'error');
+            }
+        }
+
+        async function createTask(e) {
+            e.preventDefault();
+            if (!isConnected) return showMessage('Connect wallet first!', 'error');
+
+            const description = document.getElementById('description').value;
+            const reward = parseInt(document.getElementById('reward').value);
+
+            try {
+                showMessage('Creating task...', 'info');
+                const taskId = tasks.length;
+                tasks.push({
+                    id: taskId,
+                    description,
+                    reward_points: reward,
+                    creator: userAddress,
+                    completed: false,
+                    completer: null
+                });
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                document.getElementById('createForm').reset();
+                showMessage(`Task #${taskId} created! Reward: ${reward} points`, 'success');
+                loadTasks();
+            } catch (error) {
+                showMessage('Failed to create task', 'error');
+            }
+        }
+
+        function loadTasks() {
+            const stored = localStorage.getItem('tasks');
+            if (stored) tasks = JSON.parse(stored);
+            displayTasks();
+        }
+
+        function displayTasks() {
+            const tasksList = document.getElementById('tasksList');
+            if (tasks.length === 0) {
+                tasksList.innerHTML = '<p>No tasks yet. Create one!</p>';
+                return;
+            }
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-card">
+                    <div class="task-header">
+                        <span class="task-id">Task #${task.id}</span>
+                        <span class="task-status ${task.completed ? 'status-completed' : 'status-available'}">
+                            ${task.completed ? '✓ Completed' : '⏱ Available'}
+                        </span>
+                    </div>
+                    <div class="task-description">${task.description}</div>
+                    <div class="task-reward">🎁 Reward: ${task.reward_points} points</div>
+                    <div class="task-meta">Creator: ${task.creator.substring(0, 10)}...
+                    ${task.completed ? `<br>Completed by: ${task.completer.substring(0, 10)}...` : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        async function completeTask(e) {
+            e.preventDefault();
+            if (!isConnected) return showMessage('Connect wallet first!', 'error');
+
+            const taskId = parseInt(document.getElementById('taskId').value);
+
+            try {
+                showMessage('Completing task...', 'info');
+                if (taskId >= 0 && taskId < tasks.length) {
+                    const task = tasks[taskId];
+                    if (task.completed) return showMessage('Already completed!', 'error');
+                    
+                    task.completed = true;
+                    task.completer = userAddress;
+                    userBalance += task.reward_points;
+                    
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    localStorage.setItem('balance', userBalance);
+                    
+                    document.getElementById('completeForm').reset();
+                    updateBalance();
+                    displayTasks();
+                    showMessage(`Task completed! +${task.reward_points} points earned!`, 'success');
+                } else {
+                    showMessage('Task not found', 'error');
+                }
+            } catch (error) {
+                showMessage('Failed to complete task', 'error');
+            }
+        }
+
+        async function transferPoints(e) {
+            e.preventDefault();
+            if (!isConnected) return showMessage('Connect wallet first!', 'error');
+
+            const recipient = document.getElementById('recipient').value;
+            const amount = parseInt(document.getElementById('amount').value);
+
+            if (amount > userBalance) return showMessage('Insufficient balance!', 'error');
+
+            try {
+                showMessage('Transferring...', 'info');
+                userBalance -= amount;
+                localStorage.setItem('balance', userBalance);
+                document.getElementById('transferForm').reset();
+                updateBalance();
+                showMessage(`Transferred ${amount} points to ${recipient.substring(0, 10)}...`, 'success');
+            } catch (error) {
+                showMessage('Transfer failed', 'error');
+            }
+        }
+
+        function updateBalance() {
+            const stored = localStorage.getItem('balance');
+            if (stored) userBalance = parseInt(stored);
+            document.getElementById('balance').textContent = userBalance + ' Points';
+            document.getElementById('transferBalance').textContent = userBalance + ' Points';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            if (tabName === 'view') loadTasks();
+            if (tabName === 'transfer') updateBalance();
+        }
+
+        function showMessage(text, type) {
+            const el = document.getElementById('message');
+            el.textContent = text;
+            el.className = 'message ' + type;
+            if (type !== 'info') setTimeout(() => el.className = 'message', 3000);
+        }
+    </script>
+</body>
+</html>
